@@ -10,7 +10,7 @@ jobs:
       - run: |
          ls -halt 
          #cp -v DF Dockerfile       #
-         docker build . -t consumere/kernels:wapest23
+         docker build . -t consumere/shinyapps:tsjl-ci
      # deploy the image
       - run: docker push consumere/shinyapps:tsjl-ci
       - run: echo "push  consumere/shinyapps:tsjl-ci done!"
