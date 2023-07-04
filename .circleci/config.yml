@@ -1,4 +1,10 @@
 version: 2.1
+dependencies:
+  pre:
+    - run:
+      name: Avoid hosts unknown for github
+      command: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+    - git clone -b circleci-project-setup git@github.com:consumere/tsjl.git ~/tsjl
 working_directory: ~/tsjl
 jobs: 
  build:
