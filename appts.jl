@@ -11,14 +11,14 @@ app = Dash.dash(
         "https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css",
         "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     ],
-    update_title="Loading..."
+    update_title="Uploading data..."
 )
 #methods(dash)
 #methods(html_div)
 
 app.layout = html_div() do
     [
-    html_h4("WaSiM Timeseries Analyzer"),    
+    html_h2("WaSiM Timeseries Analyzer"),    
     dcc_upload(
             id = "upload-data",
             children = [
@@ -206,45 +206,6 @@ function parse_contents(contents, filename)
             height=650*fact,
             width=1200*fact,
             title_text="yearly cumulated")
-
-
-
-        # ti = split(filename,".")|>first
-        # PlotlyJS.relayout!(fig2,
-        #     template="seaborn",
-        #     # template="simple_white",
-        #     # template="plotly_dark",
-        #     height=650*fact,
-        #     width=1200*fact,
-        #     title_text=ti,
-        #     updatemenus=[
-        #     Dict(
-        #         "type" => "buttons",
-        #         "direction" => "left",
-        #         "buttons" => [
-        #             Dict(
-        #                 "args" => [Dict("yaxis.type" => "linear")],
-        #                 "label" => "Linear Scale",
-        #                 "method" => "relayout"
-        #             ),
-        #             Dict(
-        #                 "args" => [Dict("yaxis.type" => "log")],
-        #                 "label" => "Log Scale",
-        #                 "method" => "relayout"
-        #             )
-        #         ],
-        #         "pad" => Dict("r" => 1, "t" => 10),
-        #         "showactive" => true,
-        #         "x" => 0.11,
-        #         #"x" => 5.11,
-        #         "xanchor" => "left",
-        #         #"xanchor" => "auto",
-        #         "y" => 1.1,
-        #         #"yanchor" => "top"
-        #         "yanchor" => "auto"
-        #     ),
-        #     ]
-        #     )
     
     end
 
@@ -260,8 +221,6 @@ function parse_contents(contents, filename)
         function yrmean(x::DataFrame)
             #df = copy(x)
             df = x
-            # y = filter(x->!occursin("date",x),names(df))
-            # s = map(y -> Symbol(y),y)
             df[!, :year] = year.(df[!,:date]);
             y = filter(x -> !(occursin(r"year|date", x)), names(df))
             dfm = DataFrames.combine(groupby(df, :year), y .=> mean .=> y);
@@ -340,24 +299,6 @@ function parse_contents(contents, filename)
     end
     return subplots1(filename)
 
-    # p = [p1 p2; p3 p4]  ##four panels
-
-    # function subplots1()
-    #     p1 = fig
-    #     p2 = fig_mean
-    #     p3 = fig2
-    #     p = [p1 p2;p3]
-    #     p
-    # end
-    # return subplots1()
-    
-    # fin = make_subplots(rows=1, cols=2)
-    # # add_trace!(fig, row=1, col=1)
-    # # add_trace!(fig2, row=1, col=2)
-    # add_trace!(fin, trace1, row=1, col=1)
-    # add_trace!(fin, trace2, row=1, col=2)
-    # relayout!(fin, title_text="Subplot Example")   
-    # return fin
 end
 
 callback!(
@@ -383,6 +324,7 @@ callback!(
     end
 end
 
-run_server(app, "0.0.0.0", 8052, debug = true)
+#run_server(app, "0.0.0.0", 8052, debug = true)
+run_server(app, "0.0.0.0", 8080, debug = true)
 #run_server(app, debug=true)
 #run_server(app, "127.0.0.1", 8050)
