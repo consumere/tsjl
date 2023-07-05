@@ -19,4 +19,5 @@ RUN julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate();'
 # COPY . /app
 
 # Set the entry point command to run the Julia script
-CMD ["julia", "apptsum.jl"]
+#CMD ["julia", "apptsum.jl"]
+CMD ["julia", "appts.jl"]
