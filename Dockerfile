@@ -16,7 +16,7 @@ RUN julia -e 'using Pkg; Pkg.add.(["Dash", "PlotlyJS","Base64","Dates","Statisti
 RUN julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate();'
 
 # Copy the rest of the application files to the container
-# COPY . /app
+COPY . /app
 
 # Set the entry point command to run the Julia script
 #CMD ["julia", "apptsum.jl"]
