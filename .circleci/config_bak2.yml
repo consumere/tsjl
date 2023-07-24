@@ -6,6 +6,8 @@ dependencies:
       command: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
     - git clone -b circleci-project-setup git@github.com:consumere/tsjl.git ~/tsjl
 working_directory: ~/tsjl
+
+
 jobs: 
  build:
     machine:
@@ -13,6 +15,8 @@ jobs:
     steps:
       - checkout
    # build the image
+      - run: |
+             echo "$dpw" | docker login --username consumere --password-stdin
       - run: |
          ls -halt 
          #cp -v DF Dockerfile       #
