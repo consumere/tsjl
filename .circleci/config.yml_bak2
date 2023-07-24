@@ -1,0 +1,13 @@
+orbs:
+  docker: circleci/docker@1.7.0
+  
+workflows:
+    example-workflow:
+      jobs:
+        - docker/publish:
+            docker-password: $dpw 
+            docker-username: $DN 
+            image: julia:latest 
+            tag: consumere/shinyapp:tsjl-ci 
+
+  
