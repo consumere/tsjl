@@ -1,0 +1,26 @@
+version: 2.1
+dependencies:
+  pre:
+    - run:
+      name: Avoid hosts unknown for github
+      command: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+    - git clone -b circleci-project-setup git@github.com:consumere/tsjl.git ~/tsjl
+working_directory: ~/tsjl
+jobs: 
+ build:
+    machine:
+      image: 'ubuntu-2004:current'
+    steps:
+      - checkout
+   # build the image
+      - run: |
+         ls -halt 
+         #cp -v DF Dockerfile       #
+         docker build . -t consumere/shinyapp:tsjl-ci
+     # deploy the image
+      - run: docker push consumere/shinyapp:tsjl-ci
+      - run: echo "push  consumere/shinyapp:tsjl-ci done!"
+      - run: ls -l
+      - run: echo "tsjl-ci workflow done!"
+
+  
