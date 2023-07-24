@@ -22,4 +22,4 @@ COPY . /app
 
 CMD ["julia", "appts.jl"]
 
-#docker run -p 8080:8080 consumere/shinyapps:japp
+#docker run -p 8080:8080 consumere/shinyapp:tsjl-ci

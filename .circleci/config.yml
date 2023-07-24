@@ -16,10 +16,10 @@ jobs:
       - run: |
          ls -halt 
          #cp -v DF Dockerfile       #
-         docker build . -t consumere/shinyapps:tsjl-ci
+         docker build . -t consumere/shinyapp:tsjl-ci
      # deploy the image
-      - run: docker push consumere/shinyapps:tsjl-ci
-      - run: echo "push  consumere/shinyapps:tsjl-ci done!"
+      - run: docker push consumere/shinyapp:tsjl-ci
+      - run: echo "push  consumere/shinyapp:tsjl-ci done!"
       - run: ls -l
       - run: echo "tsjl-ci workflow done!"
 
