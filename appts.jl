@@ -1,8 +1,9 @@
 using Dash
-using CSV
 using DataFrames
 using PlotlyJS
-using Base64
+using CSV
+#import CSV.File
+import Base64.base64decode
 using Dates
 using Statistics
 
@@ -11,15 +12,13 @@ app = Dash.dash(
         "https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css",
         "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     ],
-    update_title="Uploading data..."
+    update_title="Loading..."
 )
-#methods(dash)
-#methods(html_div)
 
 app.layout = html_div() do
     [
-    html_h2("WaSiM Timeseries Analyzer"),    
-    dcc_upload(
+        html_h4("WaSiM Timeseries Analyzer"),    
+        dcc_upload(
             id = "upload-data",
             children = [
                 html_div("Drag and Drop"),
@@ -37,17 +36,30 @@ app.layout = html_div() do
             ),
             multiple = true
         ),
-        html_div(id = "output-graph")
+        dcc_loading(
+            id = "loading",
+            type = "circle",
+            children = [
+                html_div(id = "output-graph")
+            ]
+        )
     ]
 end
 
 function parse_contents(contents, filename)
+    printstyled("reading $filename...\n",color=:green)
     # Read the contents of the uploaded file
     content_type, content_string = split(contents, ',')
 
     decoded = base64decode(content_string)
     ms = ["-9999.0", "-9999", "lin", "log", "--"]
-    df = CSV.File(IOBuffer(decoded); delim="\t", header=1, normalizenames=true,
+    df = CSV.File(IOBuffer(decoded);
+        #delim=" ", 
+        #ignorerepeated=true,
+        silencewarnings=true,
+        header=1, 
+        normalizenames=true,
+        #ignoreemptyrows=true,
         missingstring=ms, types=Float64) |> DataFrame
     dropmissing!(df, 1)
     for i in 1:3
@@ -57,19 +69,9 @@ function parse_contents(contents, filename)
     df = df[:, Not(1:4)]
     #dropmissing!(df)
     
-    
+    printstyled("generating graphs...\n",color=:green)
     ###first figure ###########################
     begin
-    
-    #fig = PlotlyJS.make_subplots(shared_xaxes=true)
-    #fig = PlotlyJS.make_subplots()
-    # tcols = size(df)[2] - 1
-
-    # for i in 1:tcols
-    #     PlotlyJS.add_trace!(fig, 
-    #     PlotlyJS.scatter(x=df.date, y=df[:, i], name=names(df)[i])
-    #     )
-    # end
 
     s = (filter(x->!occursin(r"year|date",x),names(df)))
     #renamer - remove char _   
@@ -95,8 +97,8 @@ function parse_contents(contents, filename)
         #template="simple_white",
         height=650*fact,
         width=1200*fact,
-        title_text="",
-        xaxis_rangeslider_visible=false,
+        title_text="",  
+        xaxis_rangeslider_visible=true,
         #xperiod = first(df.date),
         #xperiodalignment = "start",
         updatemenus=[
@@ -127,26 +129,12 @@ function parse_contents(contents, filename)
             ),
         ]
         )
-
-    
-    
-    
-    #    s = Symbol.(filter(x->!occursin(r"year|date",x),names(df)))
     end
     
     ##############hist aggregated#################
     begin
         #fig_hist=plot(
             fig_hist = PlotlyJS.make_subplots(shared_xaxes=true, shared_yaxes=true)
-
-            # for i in s
-            #     PlotlyJS.add_trace!(fig_hist, 
-            #     #PlotlyJS.scatter(x=df.date, y=df[:, i], name=i)
-            #     [
-            #         histogram(df, x=:date, y=i, histfunc="avg", xbins_size="M1", name="hist"),
-            #         scatter(df, mode="markers", x=:date, y=i, name="daily"),
-            #     ])
-            # end
 
             for i in s
                 PlotlyJS.add_trace!(fig_hist, 
@@ -184,13 +172,6 @@ function parse_contents(contents, filename)
         
         fig2 = PlotlyJS.plot(dfyr, kind = "bar");
         
-        # s = (filter(x->!occursin(r"year|date",x),names(dfyr)))
-        # #renamer - remove chars   
-        # for x in s
-        #     newname=replace(x,"_"=>" ")
-        #     #println(newname)
-        #     rename!(df,Dict(x=>newname))
-        # end
         s = Symbol.(filter(x->!occursin(r"year|date",x),names(dfyr)))
         
         for i in s;
@@ -206,7 +187,7 @@ function parse_contents(contents, filename)
             height=650*fact,
             width=1200*fact,
             title_text="yearly cumulated")
-    
+
     end
 
     # function subplots1()
@@ -221,6 +202,8 @@ function parse_contents(contents, filename)
         function yrmean(x::DataFrame)
             #df = copy(x)
             df = x
+            # y = filter(x->!occursin("date",x),names(df))
+            # s = map(y -> Symbol(y),y)
             df[!, :year] = year.(df[!,:date]);
             y = filter(x -> !(occursin(r"year|date", x)), names(df))
             dfm = DataFrames.combine(groupby(df, :year), y .=> mean .=> y);
@@ -257,7 +240,7 @@ function parse_contents(contents, filename)
         p2 = fig2
         p3 = fig_mean
         p4 = fig_hist
-        p = [p1 p2; p3 p4]
+        p = [p1 p4; p2 p3]
         ti = split(filename,".")|>first
         fact = 1.11
         PlotlyJS.relayout!(p,
@@ -304,7 +287,6 @@ end
 callback!(
     app,
     Output("output-graph", "children"),
-#    Output("yrsum-graph", "children"),
     [Input("upload-data", "contents")],
     [State("upload-data", "filename")]
 ) do contents, filenames
@@ -324,7 +306,4 @@ callback!(
     end
 end
 
-#run_server(app, "0.0.0.0", 8052, debug = true)
-run_server(app, "0.0.0.0", 8080, debug = true)
-#run_server(app, debug=true)
-#run_server(app, "127.0.0.1", 8050)
+run_server(app, "127.0.0.1", 8080, debug = true)
