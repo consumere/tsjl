@@ -99,8 +99,6 @@ function parse_contents(contents, filename)
         width=1200*fact,
         title_text="",  
         xaxis_rangeslider_visible=true,
-        #xperiod = first(df.date),
-        #xperiodalignment = "start",
         updatemenus=[
             Dict(
                 "type" => "buttons",
@@ -132,13 +130,18 @@ function parse_contents(contents, filename)
     end
     
     ##############hist aggregated#################
+    #s = (filter(x->!occursin(r"year|date",x),names(df)))
     begin
         #fig_hist=plot(
             fig_hist = PlotlyJS.make_subplots(shared_xaxes=true, shared_yaxes=true)
 
             for i in s
                 PlotlyJS.add_trace!(fig_hist, 
-                histogram(df, x=:date, y=i, histfunc="avg", xbins_size="M1", name=i))
+                histogram(df, x=:date, y=i, histfunc="avg", 
+		xbins_size="M1", 
+		name=string(i)
+		)
+		)
             end
 
             PlotlyJS.relayout!(fig_hist,
@@ -170,8 +173,11 @@ function parse_contents(contents, filename)
 
         dfyr = yrsum(df)
         
-        fig2 = PlotlyJS.plot(dfyr, kind = "bar");
-        
+        fig2 = PlotlyJS.plot(dfyr, kind = "bar",
+		texttemplate="%{text:.2s}",
+		textposition="outside"
+		);
+	        
         s = Symbol.(filter(x->!occursin(r"year|date",x),names(dfyr)))
         
         for i in s;
@@ -200,21 +206,21 @@ function parse_contents(contents, filename)
     ############df_yearmean ##################
     begin    
         function yrmean(x::DataFrame)
-            #df = copy(x)
             df = x
-            # y = filter(x->!occursin("date",x),names(df))
-            # s = map(y -> Symbol(y),y)
             df[!, :year] = year.(df[!,:date]);
             y = filter(x -> !(occursin(r"year|date", x)), names(df))
             dfm = DataFrames.combine(groupby(df, :year), y .=> mean .=> y);
             return(dfm)
         end
         
-        # df = readdf(glob("qges")|>first)
         dfm = copy(df)
         dfm = yrmean(dfm)
 
-        fig_mean = PlotlyJS.plot(dfm, kind = "bar");
+        fig_mean = PlotlyJS.plot(dfm, kind = "bar" ,
+		texttemplate="%{text:.2s}",
+		textposition="outside"
+		);
+		
         s = Symbol.(filter(x->!occursin(r"year|date",x),names(dfm)))
         
         for i in s;
@@ -250,6 +256,8 @@ function parse_contents(contents, filename)
             height=650*fact,
             width=1200*fact,
             title_text=ti,
+	    texttemplate="%{text:.2s}",
+	    textposition="outside",
             updatemenus=[
             Dict(
                 "type" => "buttons",
