@@ -198,6 +198,12 @@ function parse_contents(contents, filename)
 
     end
 
+    # function subplots1()
+    #     p1 = fig
+    #     p2 = fig2
+    #     p = [p1 p2]
+    #     p
+    # end
 
     ############df_yearmean ##################
     begin    
@@ -237,7 +243,53 @@ function parse_contents(contents, filename)
     end
 
 
-
+    function subplots1(filename)
+        p1 = fig
+        p2 = fig2
+        p3 = fig_mean
+        p4 = fig_hist
+        p = [p1 p4; p2 p3]
+        ti = split(filename,".")|>first
+        fact = 1.11
+        PlotlyJS.relayout!(p,
+            template="seaborn",
+            # template="simple_white",
+            # template="plotly_dark",
+            height=650*fact,
+            width=1200*fact,
+            title_text=ti,
+	    texttemplate="%{text:.2s}",
+	    textposition="outside",
+            updatemenus=[
+            Dict(
+                "type" => "buttons",
+                "direction" => "left",
+                "buttons" => [
+                    Dict(
+                        "args" => [Dict("yaxis.type" => "linear")],
+                        "label" => "Linear Scale",
+                        "method" => "relayout"
+                    ),
+                    Dict(
+                        "args" => [Dict("yaxis.type" => "log")],
+                        "label" => "Log Scale",
+                        "method" => "relayout"
+                    )
+                ],
+                "pad" => Dict("r" => 1, "t" => 10),
+                "showactive" => true,
+                "x" => 0.11,
+                #"x" => 5.11,
+                "xanchor" => "left",
+                #"xanchor" => "auto",
+                "y" => 1.1,
+                #"yanchor" => "top"
+                "yanchor" => "auto"
+            ),
+            ]
+            )
+        p
+    end
 
     # function waread(x::String)
     #     """
@@ -499,58 +551,8 @@ function parse_contents(contents, filename)
     #return subplots1(filename)
     
     #Plots.plotlyjs()
-
-    function subplots1(filename)
-        p1 = fig
-        p2 = fig2
-        p3 = fig_mean
-        p4 = fig_hist
-        p = [p1 p4; p2 p3]
-        ti = split(filename,".")|>first
-        fact = 1.11
-        PlotlyJS.relayout!(p,
-            template="seaborn",
-            # template="simple_white",
-            # template="plotly_dark",
-            height=650*fact,
-            width=1200*fact,
-            title_text=ti,
-	    texttemplate="%{text:.2s}",
-	    textposition="outside",
-            updatemenus=[
-            Dict(
-                "type" => "buttons",
-                "direction" => "left",
-                "buttons" => [
-                    Dict(
-                        "args" => [Dict("yaxis.type" => "linear")],
-                        "label" => "Linear Scale",
-                        "method" => "relayout"
-                    ),
-                    Dict(
-                        "args" => [Dict("yaxis.type" => "log")],
-                        "label" => "Log Scale",
-                        "method" => "relayout"
-                    )
-                ],
-                "pad" => Dict("r" => 1, "t" => 10),
-                "showactive" => true,
-                "x" => 0.11,
-                #"x" => 5.11,
-                "xanchor" => "left",
-                #"xanchor" => "auto",
-                "y" => 1.1,
-                #"yanchor" => "top"
-                "yanchor" => "auto"
-            ),
-            ]
-            )
-        p
-    end
-
-    pd = dfpjs(df)
     
-    return [pd, subplots1(filename)]
+    return dfpjs(df)
 
 end
 

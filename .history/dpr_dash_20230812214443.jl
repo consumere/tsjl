@@ -550,7 +550,7 @@ function parse_contents(contents, filename)
 
     pd = dfpjs(df)
     
-    return [pd, subplots1(filename)]
+    return []
 
 end
 

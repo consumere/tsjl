@@ -73,171 +73,223 @@ function parse_contents(contents, filename)
     
     printstyled("generating graphs...\n",color=:green)
     # ###first figure ###########################
-    begin
+    # begin
 
-    s = (filter(x->!occursin(r"year|date",x),names(df)))
-    #renamer - remove char _   
-    for x in s
-        newname=replace(x,"_"=>" ")
-        rename!(df,Dict(x=>newname))
-    end
-    s = Symbol.(filter(x->!occursin(r"year|date",x),names(df)))
+    # s = (filter(x->!occursin(r"year|date",x),names(df)))
+    # #renamer - remove char _   
+    # for x in s
+    #     newname=replace(x,"_"=>" ")
+    #     rename!(df,Dict(x=>newname))
+    # end
+    # s = Symbol.(filter(x->!occursin(r"year|date",x),names(df)))
     
-    fig = PlotlyJS.make_subplots(shared_xaxes=true, shared_yaxes=true)
+    # fig = PlotlyJS.make_subplots(shared_xaxes=true, shared_yaxes=true)
 
-    for i in s
-        PlotlyJS.add_trace!(fig, 
-        PlotlyJS.scatter(x=df.date, y=df[:, i], name=i)
-        )
-    end
+    # for i in s
+    #     PlotlyJS.add_trace!(fig, 
+    #     PlotlyJS.scatter(x=df.date, y=df[:, i], name=i)
+    #     )
+    # end
 
-    ti = filename
-    #fact = 1.1
-    fact = .88
-    PlotlyJS.relayout!(fig,
-        template="seaborn",
-        #template="simple_white",
-        height=650*fact,
-        width=1200*fact,
-        title_text="",  
-        xaxis_rangeslider_visible=true,
-        updatemenus=[
-            Dict(
-                "type" => "buttons",
-                "direction" => "left",
-                "buttons" => [
-                    Dict(
-                        "args" => [Dict("yaxis.type" => "linear")],
-                        "label" => "Linear Scale",
-                        "method" => "relayout"
-                    ),
-                    Dict(
-                        "args" => [Dict("yaxis.type" => "log")],
-                        "label" => "Log Scale",
-                        "method" => "relayout"
-                    )
-                ],
-                "pad" => Dict("r" => 1, "t" => 10),
-                "showactive" => true,
-                "x" => 0.11,
-                #"x" => 5.11,
-                "xanchor" => "left",
-                #"xanchor" => "auto",
-                "y" => 1.1,
-                #"yanchor" => "top"
-                "yanchor" => "auto"
-            ),
-        ]
-        )
-    end
+    # ti = filename
+    # #fact = 1.1
+    # fact = .88
+    # PlotlyJS.relayout!(fig,
+    #     template="seaborn",
+    #     #template="simple_white",
+    #     height=650*fact,
+    #     width=1200*fact,
+    #     title_text="",  
+    #     xaxis_rangeslider_visible=true,
+    #     updatemenus=[
+    #         Dict(
+    #             "type" => "buttons",
+    #             "direction" => "left",
+    #             "buttons" => [
+    #                 Dict(
+    #                     "args" => [Dict("yaxis.type" => "linear")],
+    #                     "label" => "Linear Scale",
+    #                     "method" => "relayout"
+    #                 ),
+    #                 Dict(
+    #                     "args" => [Dict("yaxis.type" => "log")],
+    #                     "label" => "Log Scale",
+    #                     "method" => "relayout"
+    #                 )
+    #             ],
+    #             "pad" => Dict("r" => 1, "t" => 10),
+    #             "showactive" => true,
+    #             "x" => 0.11,
+    #             #"x" => 5.11,
+    #             "xanchor" => "left",
+    #             #"xanchor" => "auto",
+    #             "y" => 1.1,
+    #             #"yanchor" => "top"
+    #             "yanchor" => "auto"
+    #         ),
+    #     ]
+    #     )
+    # end
     
-    ##############hist aggregated#################
-    #s = (filter(x->!occursin(r"year|date",x),names(df)))
-    begin
-        #fig_hist=plot(
-            fig_hist = PlotlyJS.make_subplots(shared_xaxes=true, shared_yaxes=true)
+    # ##############hist aggregated#################
+    # #s = (filter(x->!occursin(r"year|date",x),names(df)))
+    # begin
+    #     #fig_hist=plot(
+    #         fig_hist = PlotlyJS.make_subplots(shared_xaxes=true, shared_yaxes=true)
 
-            for i in s
-                PlotlyJS.add_trace!(fig_hist, 
-                histogram(df, x=:date, y=i, histfunc="avg", 
-		xbins_size="M1", 
-		name=string(i)
-		)
-		)
-            end
+    #         for i in s
+    #             PlotlyJS.add_trace!(fig_hist, 
+    #             histogram(df, x=:date, y=i, histfunc="avg", 
+	# 	xbins_size="M1", 
+	# 	name=string(i)
+	# 	)
+	# 	)
+    #         end
 
-            PlotlyJS.relayout!(fig_hist,
-                template="seaborn",
-                xaxis_rangeslider_visible=true,
-                #template="simple_white",
-                height=650*fact,
-                width=1200*fact,
-                title_text="monthly average",
-                bargap=0.1,
-                    xaxis=attr(showgrid=true, ticklabelmode="period", dtick="M1", tickformat="%b\n%Y")
-                )
+    #         PlotlyJS.relayout!(fig_hist,
+    #             template="seaborn",
+    #             xaxis_rangeslider_visible=true,
+    #             #template="simple_white",
+    #             height=650*fact,
+    #             width=1200*fact,
+    #             title_text="monthly average",
+    #             bargap=0.1,
+    #                 xaxis=attr(showgrid=true, ticklabelmode="period", dtick="M1", tickformat="%b\n%Y")
+    #             )
             
        
-    end
+    # end
     
     
-    #####################df_yearsum ##################
-    begin
-        function yrsum(x::DataFrame)
-            df = copy(x)
-            y = filter(x->!occursin("date",x),names(df))
-            s = map(y -> Symbol(y),y)
-            df[!, :year] = year.(df[!,:date]);
-            df_yearsum = DataFrames.combine(groupby(df, :year), y .=> sum .=> y);
-            return(df_yearsum)
-        end
+    # #####################df_yearsum ##################
+    # begin
+    #     function yrsum(x::DataFrame)
+    #         df = copy(x)
+    #         y = filter(x->!occursin("date",x),names(df))
+    #         s = map(y -> Symbol(y),y)
+    #         df[!, :year] = year.(df[!,:date]);
+    #         df_yearsum = DataFrames.combine(groupby(df, :year), y .=> sum .=> y);
+    #         return(df_yearsum)
+    #     end
 
 
-        dfyr = yrsum(df)
+    #     dfyr = yrsum(df)
         
-        fig2 = PlotlyJS.plot(dfyr, kind = "bar",
-		texttemplate="%{text:.2s}",
-		textposition="outside"
-		);
+    #     fig2 = PlotlyJS.plot(dfyr, kind = "bar",
+	# 	texttemplate="%{text:.2s}",
+	# 	textposition="outside"
+	# 	);
 	        
-        s = Symbol.(filter(x->!occursin(r"year|date",x),names(dfyr)))
+    #     s = Symbol.(filter(x->!occursin(r"year|date",x),names(dfyr)))
         
-        for i in s;
-            PlotlyJS.add_trace!(fig2, 
-            PlotlyJS.bar(x=dfyr.year, y=dfyr[:,i],
-            name=i)       );
-        end
+    #     for i in s;
+    #         PlotlyJS.add_trace!(fig2, 
+    #         PlotlyJS.bar(x=dfyr.year, y=dfyr[:,i],
+    #         name=i)       );
+    #     end
 
-            PlotlyJS.relayout!(fig2,
-            template="seaborn",
-            # template="simple_white",
-            # template="plotly_dark",
-            height=650*fact,
-            width=1200*fact,
-            title_text="yearly cumulated")
+    #         PlotlyJS.relayout!(fig2,
+    #         template="seaborn",
+    #         # template="simple_white",
+    #         # template="plotly_dark",
+    #         height=650*fact,
+    #         width=1200*fact,
+    #         title_text="yearly cumulated")
 
-    end
+    # end
 
+    # # function subplots1()
+    # #     p1 = fig
+    # #     p2 = fig2
+    # #     p = [p1 p2]
+    # #     p
+    # # end
 
-    ############df_yearmean ##################
-    begin    
-        function yrmean(x::DataFrame)
-            df = x
-            df[!, :year] = year.(df[!,:date]);
-            y = filter(x -> !(occursin(r"year|date", x)), names(df))
-            dfm = DataFrames.combine(groupby(df, :year), y .=> mean .=> y);
-            return(dfm)
-        end
+    # ############df_yearmean ##################
+    # begin    
+    #     function yrmean(x::DataFrame)
+    #         df = x
+    #         df[!, :year] = year.(df[!,:date]);
+    #         y = filter(x -> !(occursin(r"year|date", x)), names(df))
+    #         dfm = DataFrames.combine(groupby(df, :year), y .=> mean .=> y);
+    #         return(dfm)
+    #     end
         
-        dfm = copy(df)
-        dfm = yrmean(dfm)
+    #     dfm = copy(df)
+    #     dfm = yrmean(dfm)
 
-        fig_mean = PlotlyJS.plot(dfm, kind = "bar" ,
-		texttemplate="%{text:.2s}",
-		textposition="outside"
-		);
+    #     fig_mean = PlotlyJS.plot(dfm, kind = "bar" ,
+	# 	texttemplate="%{text:.2s}",
+	# 	textposition="outside"
+	# 	);
 		
-        s = Symbol.(filter(x->!occursin(r"year|date",x),names(dfm)))
+    #     s = Symbol.(filter(x->!occursin(r"year|date",x),names(dfm)))
         
-        for i in s;
-            PlotlyJS.add_trace!(fig_mean, 
-            PlotlyJS.bar(x=dfm.year, y=dfm[:,i],
-            name=i)       );
-        end
+    #     for i in s;
+    #         PlotlyJS.add_trace!(fig_mean, 
+    #         PlotlyJS.bar(x=dfm.year, y=dfm[:,i],
+    #         name=i)       );
+    #     end
 
-        PlotlyJS.relayout!(fig_mean,
-            template="seaborn",
-            # template="simple_white",
-            # template="plotly_dark",
-            height=650*fact,
-            width=1200*fact,
-            title_text="yearly average")
+    #     PlotlyJS.relayout!(fig_mean,
+    #         template="seaborn",
+    #         # template="simple_white",
+    #         # template="plotly_dark",
+    #         height=650*fact,
+    #         width=1200*fact,
+    #         title_text="yearly average")
 
         
-    end
+    # end
 
 
-
+    # function subplots1(filename)
+    #     p1 = fig
+    #     p2 = fig2
+    #     p3 = fig_mean
+    #     p4 = fig_hist
+    #     p = [p1 p4; p2 p3]
+    #     ti = split(filename,".")|>first
+    #     fact = 1.11
+    #     PlotlyJS.relayout!(p,
+    #         template="seaborn",
+    #         # template="simple_white",
+    #         # template="plotly_dark",
+    #         height=650*fact,
+    #         width=1200*fact,
+    #         title_text=ti,
+	#     texttemplate="%{text:.2s}",
+	#     textposition="outside",
+    #         updatemenus=[
+    #         Dict(
+    #             "type" => "buttons",
+    #             "direction" => "left",
+    #             "buttons" => [
+    #                 Dict(
+    #                     "args" => [Dict("yaxis.type" => "linear")],
+    #                     "label" => "Linear Scale",
+    #                     "method" => "relayout"
+    #                 ),
+    #                 Dict(
+    #                     "args" => [Dict("yaxis.type" => "log")],
+    #                     "label" => "Log Scale",
+    #                     "method" => "relayout"
+    #                 )
+    #             ],
+    #             "pad" => Dict("r" => 1, "t" => 10),
+    #             "showactive" => true,
+    #             "x" => 0.11,
+    #             #"x" => 5.11,
+    #             "xanchor" => "left",
+    #             #"xanchor" => "auto",
+    #             "y" => 1.1,
+    #             #"yanchor" => "top"
+    #             "yanchor" => "auto"
+    #         ),
+    #         ]
+    #         )
+    #     p
+    # end
 
     # function waread(x::String)
     #     """
@@ -499,58 +551,8 @@ function parse_contents(contents, filename)
     #return subplots1(filename)
     
     #Plots.plotlyjs()
-
-    function subplots1(filename)
-        p1 = fig
-        p2 = fig2
-        p3 = fig_mean
-        p4 = fig_hist
-        p = [p1 p4; p2 p3]
-        ti = split(filename,".")|>first
-        fact = 1.11
-        PlotlyJS.relayout!(p,
-            template="seaborn",
-            # template="simple_white",
-            # template="plotly_dark",
-            height=650*fact,
-            width=1200*fact,
-            title_text=ti,
-	    texttemplate="%{text:.2s}",
-	    textposition="outside",
-            updatemenus=[
-            Dict(
-                "type" => "buttons",
-                "direction" => "left",
-                "buttons" => [
-                    Dict(
-                        "args" => [Dict("yaxis.type" => "linear")],
-                        "label" => "Linear Scale",
-                        "method" => "relayout"
-                    ),
-                    Dict(
-                        "args" => [Dict("yaxis.type" => "log")],
-                        "label" => "Log Scale",
-                        "method" => "relayout"
-                    )
-                ],
-                "pad" => Dict("r" => 1, "t" => 10),
-                "showactive" => true,
-                "x" => 0.11,
-                #"x" => 5.11,
-                "xanchor" => "left",
-                #"xanchor" => "auto",
-                "y" => 1.1,
-                #"yanchor" => "top"
-                "yanchor" => "auto"
-            ),
-            ]
-            )
-        p
-    end
-
-    pd = dfpjs(df)
     
-    return [pd, subplots1(filename)]
+    return dfpjs(df)
 
 end
 
