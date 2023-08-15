@@ -52,6 +52,18 @@ function parse_contents(contents, filename)
     content_type, content_string = split(contents, ',')
 
     decoded = base64decode(content_string)
+
+    #md = readdlm(IOBuffer(decoded))[2]
+    md = CSV.File(IOBuffer(decoded);
+        limit=1,header=1, 
+        select=[1],silencewarnings=true)|>DataFrame
+    
+    md = only(md.YY)
+
+    
+
+
+
     ms = ["-9999.0", "-9999", "lin", "log", "--"]
     df = CSV.File(IOBuffer(decoded);
         #delim=" ", 
@@ -81,7 +93,9 @@ function parse_contents(contents, filename)
     end
     s = Symbol.(filter(x->!occursin(r"year|date",x),names(df)))
     
-    fig = PlotlyJS.make_subplots(shared_xaxes=true, shared_yaxes=true)
+    fig = PlotlyJS.make_subplots(
+        shared_xaxes=true, 
+        shared_yaxes=true)
 
     for i in s
         PlotlyJS.add_trace!(fig, 
@@ -97,36 +111,8 @@ function parse_contents(contents, filename)
         #template="simple_white",
         height=650*fact,
         width=1200*fact,
-        title_text="",  
-        xaxis_rangeslider_visible=true,
-        updatemenus=[
-            Dict(
-                "type" => "buttons",
-                "direction" => "left",
-                "buttons" => [
-                    Dict(
-                        "args" => [Dict("yaxis.type" => "linear")],
-                        "label" => "Linear Scale",
-                        "method" => "relayout"
-                    ),
-                    Dict(
-                        "args" => [Dict("yaxis.type" => "log")],
-                        "label" => "Log Scale",
-                        "method" => "relayout"
-                    )
-                ],
-                "pad" => Dict("r" => 1, "t" => 10),
-                "showactive" => true,
-                "x" => 0.11,
-                #"x" => 5.11,
-                "xanchor" => "left",
-                #"xanchor" => "auto",
-                "y" => 1.1,
-                #"yanchor" => "top"
-                "yanchor" => "auto"
-            ),
-        ]
-        )
+        title_text=md,  
+        xaxis_rangeslider_visible=true)
     end
     
     ##############hist aggregated#################
@@ -138,10 +124,10 @@ function parse_contents(contents, filename)
             for i in s
                 PlotlyJS.add_trace!(fig_hist, 
                 histogram(df, x=:date, y=i, histfunc="avg", 
-		xbins_size="M1", 
-		name=string(i)
-		)
-		)
+                xbins_size="M1", 
+                name=string(i)
+                )
+                )
             end
 
             PlotlyJS.relayout!(fig_hist,
@@ -251,6 +237,7 @@ function parse_contents(contents, filename)
         fact = 1.11
         PlotlyJS.relayout!(p,
             template="seaborn",
+            # vspace=0.8,
             # template="simple_white",
             # template="plotly_dark",
             height=650*fact,
@@ -277,12 +264,12 @@ function parse_contents(contents, filename)
                 "pad" => Dict("r" => 1, "t" => 10),
                 "showactive" => true,
                 "x" => 0.11,
-                #"x" => 5.11,
+                #"x" => 0.15,
                 "xanchor" => "left",
                 #"xanchor" => "auto",
-                "y" => 1.1,
+                "y" => 1.0,
                 #"yanchor" => "top"
-                "yanchor" => "auto"
+                #"yanchor" => "auto"
             ),
             ]
             )
