@@ -54,16 +54,19 @@ function parse_contents(contents, filename)
     decoded = base64decode(content_string)
 
     #md = readdlm(IOBuffer(decoded))[2]
-    md = CSV.File(IOBuffer(decoded);
-        limit=1,header=1, 
-        select=[1],silencewarnings=true)|>DataFrame
+    # md = CSV.File(IOBuffer(decoded);
+    #     limit=1,header=1, 
+    #     select=[1],silencewarnings=true)|>DataFrame
     
-    md = only(md.YY)
+    # md = only(md.YY)
+
+    # md = CSV.File(IOBuffer(decoded); limit=1, header=1, select=[1], silencewarnings=true) |> 
+    #     df -> df[1,1]|>only
+
+    md = CSV.File(IOBuffer(decoded); limit=1, header=1, select=[1], silencewarnings=true) |> 
+        stack |>only    
 
     
-
-
-
     ms = ["-9999.0", "-9999", "lin", "log", "--"]
     df = CSV.File(IOBuffer(decoded);
         #delim=" ", 
@@ -241,7 +244,7 @@ function parse_contents(contents, filename)
             # template="simple_white",
             # template="plotly_dark",
             height=650*fact,
-            width=1200*fact,
+            width=1350*fact,
             title_text=ti,
 	    texttemplate="%{text:.2s}",
 	    textposition="outside",
@@ -263,7 +266,7 @@ function parse_contents(contents, filename)
                 ],
                 "pad" => Dict("r" => 1, "t" => 10),
                 "showactive" => true,
-                "x" => 0.11,
+                "x" => 0.01,
                 #"x" => 0.15,
                 "xanchor" => "left",
                 #"xanchor" => "auto",
