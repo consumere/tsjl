@@ -53,6 +53,25 @@ function parse_contents(contents, filename)
     content_type, content_string = split(contents, ',')
     decoded = base64decode(content_string)
 
+    # ms = ["-9999.0", "-9999", "lin", "log", "--"]
+    # df = CSV.File(IOBuffer(decoded);
+    #     #delim=" ", 
+    #     #ignorerepeated=true,
+    #     silencewarnings=true,
+    #     header=1, 
+    #     normalizenames=true,
+    #     #ignoreemptyrows=true,
+    #     missingstring=ms, types=Float64) |> DataFrame
+    # dropmissing!(df, 1)
+    # for i in 1:3
+    #     df[!, i] = map(x -> Int(x), df[!, i])
+    # end
+    # df.date = Date.(string.(df[!, 1], "-", df[!, 2], "-", df[!, 3]), "yyyy-mm-dd")
+    # df = df[:, Not(1:4)]
+    
+    # DataFrames.metadata!(df, "filename", filename, style=:note)
+    # #dropmissing!(df)
+    
     printstyled("generating graph...\n",color=:green)
 
     function waread(x::Any)
@@ -77,6 +96,8 @@ function parse_contents(contents, filename)
 
     df = waread(IOBuffer(decoded);)
     DataFrames.metadata!(df, "filename", filename, style=:note)
+    #dropmissing!(df)
+    
     printstyled("generating graphs...\n",color=:green)
 
     function kge2(simulated::Vector{Float64}, observed::Vector{Float64})
@@ -200,10 +221,66 @@ function parse_contents(contents, filename)
             return fig
 
     end
+    
+
+    # function subplots1(filename)
+    #     p1 = fig
+    #     p2 = fig2
+    #     p3 = fig_mean
+    #     p4 = fig_hist
+    #     p = [p1 p4; p2 p3]
+    #     ti = split(filename,".")|>first
+    #     fact = 1.11
+    #     PlotlyJS.relayout!(p,
+    #         template="seaborn",
+    #         # template="simple_white",
+    #         # template="plotly_dark",
+    #         height=650*fact,
+    #         width=1200*fact,
+    #         title_text=ti,
+	#     texttemplate="%{text:.2s}",
+	#     textposition="outside",
+    #         updatemenus=[
+    #         Dict(
+    #             "type" => "buttons",
+    #             "direction" => "left",
+    #             "buttons" => [
+    #                 Dict(
+    #                     "args" => [Dict("yaxis.type" => "linear")],
+    #                     "label" => "Linear Scale",
+    #                     "method" => "relayout"
+    #                 ),
+    #                 Dict(
+    #                     "args" => [Dict("yaxis.type" => "log")],
+    #                     "label" => "Log Scale",
+    #                     "method" => "relayout"
+    #                 )
+    #             ],
+    #             "pad" => Dict("r" => 1, "t" => 10),
+    #             "showactive" => true,
+    #             "x" => 0.11,
+    #             #"x" => 5.11,
+    #             "xanchor" => "left",
+    #             #"xanchor" => "auto",
+    #             "y" => 1.1,
+    #             #"yanchor" => "top"
+    #             "yanchor" => "auto"
+    #         ),
+    #         ]
+    #         )
+    #     p
+    # end
 
     pd = dfpjs(df)
 
+    # Combine the subplots vertically
+    #combined_plot = vcat([pd, subplots1(filename)]...)
+    #combined_plot = hcat([subplots1(filename), pd ]...)
+
+    #combined_plot = [pd subplots1(filename)]
+    
     return pd
+
 
 end
 

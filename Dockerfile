@@ -12,16 +12,20 @@ RUN julia -e 'using Pkg; Pkg.add.(["CSV", "DataFrames", "Dash", "PlotlyJS","Base
 
 #RUN julia -e 'using Pkg; Pkg.add.(["CSV", "DataFrames", "Dash","Plots", "PlotlyJS","Base64","Dates","Statistics"])'
 
-
 # Install the Julia packages
-RUN julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate();'
+RUN julia -e 'using Pkg; Pkg.activate("."); Pkg.update("."); Pkg.instantiate();'
 
 # Copy the rest of the application files to the container
 COPY . /app
 
 # CMD ["julia", "appts.jl"]
 # CMD ["julia", "dpr_dash.jl"]
-CMD ["julia --optimize=3 --math-mode=fast", "dpr_dash.jl"]
+
+EXPOSE 8050
+
+#CMD ["julia --optimize=3 --math-mode=fast", "dpr_dash.jl"]
+
+CMD ["julia","--optimize=3","--math-mode=fast","dpr_dash.jl"]
 
 
 #docker build -t consumere/shinyapp:dprjs .
