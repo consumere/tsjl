@@ -23,9 +23,16 @@ COPY . /app
 
 EXPOSE 8050
 
-#CMD ["julia --optimize=3 --math-mode=fast", "dpr_dash.jl"]
+CMD ["julia --optimize=3 --math-mode=fast", "dpr_dash.jl"]
+#CMD ["julia","--optimize=3","--math-mode=fast","dpr_dash.jl"]
 
-CMD ["julia","--optimize=3","--math-mode=fast","dpr_dash.jl"]
+#mit dem push wird das image in dockerhub geladen: (via circleci)
+#docker run -p 8088:8050 consumere/shinyapp:tsjl-ci 
+
+# a=consumere/shinyapps:dprjs  
+# b=consumere/shinyapp:tsjl-ci 
+# docker commit $b $a
+# docker push $a
 
 
 #docker build -t consumere/shinyapp:dprjs .
