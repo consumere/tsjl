@@ -23,8 +23,9 @@ COPY . /app
 
 EXPOSE 8050
 
-CMD ["julia --optimize=3 --math-mode=fast", "dpr_dash.jl"]
-#CMD ["julia","--optimize=3","--math-mode=fast","dpr_dash.jl"]
+#/usr/local/bin/docker-entrypoint.sh: 11: exec: julia --optimize=3 --math-mode=fast: not found 
+#CMD ["julia --optimize=3 --math-mode=fast", "dpr_dash.jl"]
+CMD ["julia", "--math-mode=fast","dpr_dash.jl"]
 
 #mit dem push wird das image in dockerhub geladen: (via circleci)
 #docker run -p 8088:8050 consumere/shinyapp:tsjl-ci 
