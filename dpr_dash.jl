@@ -6,8 +6,6 @@ import Base64.base64decode
 using Dates
 using Statistics
 
-#using Plots
-
 app = Dash.dash(
     external_stylesheets=[
         "https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css",
@@ -230,3 +228,4 @@ end
 
 #run_server(app, "127.0.0.1", 8050, debug = true)
 run_server(app, debug = true)
+
