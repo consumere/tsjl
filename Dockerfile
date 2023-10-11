@@ -25,7 +25,14 @@ EXPOSE 8050
 #/usr/local/bin/docker-entrypoint.sh: 11: exec: julia --optimize=3 --math-mode=fast: not found 
 #CMD ["julia", "--math-mode=fast","dpr_dash.jl"] #das funkt nicht.
 
-CMD ["julia --optimize=3 --math-mode=fast", "appts.jl"]
+CMD ["julia","--math-mode=fast","--optimize=3", "appts.jl"]
+
+#"--optimize=3": The --optimize flag allows you to set the level of optimization. 
+#Level 3 is the highest optimization level, which should help reduce memory consumption. 
+#It optimizes the code aggressively but might increase compilation time.
+
+#Using these options should help your script start with lower memory consumption. 
+#However, keep in mind that the actual memory usage also depends on the code in your script and the data it processes.
 
 #mit dem push wird das image in dockerhub geladen: (via circleci)
 #docker run -p 8088:8050 consumere/shinyapp:tsjl-ci 
